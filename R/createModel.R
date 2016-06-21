@@ -1,11 +1,14 @@
 #Build the model using RF for the particular algorithm using particular tasks
 createModel <- function(lrn,OMLTasks){
   #Get performance and meta features
+  print("Getting performance..")
   perf <- getPerformance(lrn,OMLTasks)
+  
+  print("Getting Meta Data..")
   meta.features <- getMetaDataForDatasets(OMLTasks,saved = TRUE)
   
   #Build the dataset
-  remove('meta.model.dataset')
+  print("Creating Dataset..")
   for(i in 1:nrow(perf)){
     row.data <- perf[i,]
     task.id <- strsplit(row.data$prob,split = '_')[[1]][[3]]
@@ -40,11 +43,14 @@ createModel <- function(lrn,OMLTasks){
   
   
   #create the model with Random Forest
+  print("Creating model..")
   rf.lrn <- makeLearner("regr.randomForest")
   task <- makeRegrTask(data = dataset, target = "acc")
   
   
    model <- train(learner = rf.lrn, task = task)
+  
+  print("Saving model..")
    save(model, file = paste('R/models/',paste(lrn$short.name,'model.RData',sep = '_'),sep = ''))
    
    return(model)
